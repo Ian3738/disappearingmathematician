@@ -60,6 +60,27 @@ function initDust() {
 /* ---------- 啟動 ---------- */
 function boot() {
   initDust();
+
+  // 綁定自訂 Gemini/MusicFX 音訊上傳
+  const bgmUpload = document.getElementById("bgmUpload");
+  const bgmName = document.getElementById("bgmName");
+  if (bgmUpload && bgmName) {
+    bgmUpload.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (typeof BGM !== "undefined") {
+          // 如果先前有建立過 ObjectURL，先釋放以避免記憶體洩漏
+          if (BGM.customAudioUrl) {
+            try { URL.revokeObjectURL(BGM.customAudioUrl); } catch(err){}
+          }
+          BGM.customAudioUrl = URL.createObjectURL(file);
+          bgmName.innerHTML = `🎵 已匯入：<span style="color:var(--gold);font-weight:bold;">${file.name}</span>`;
+          SFX.good(); // 播放成功回饋音效
+        }
+      }
+    });
+  }
+
   document.getElementById("enterBtn").addEventListener("click", () => {
     SFX.click();
     ac(); /* 使用者手勢後解鎖 AudioContext */
