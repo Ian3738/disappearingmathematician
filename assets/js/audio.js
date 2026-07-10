@@ -68,11 +68,41 @@ const BGM = {
     [116.54, 164.81, 220.00, 293.66], // A#2, E3, A3, D4 (三度增幅懸疑)
     [110.00, 146.83, 196.00, 233.08]  // A2, D3, G3, Bb3 (沉重壓抑、無法化解)
   ],
+  customAudioUrl: null,
+  customAudioEl: null,
 
   start() {
     if (this.isPlaying) return;
-    const c = ac(); if (!c) return;
     this.isPlaying = true;
+
+    // 檢查是否有使用者自訂上傳的 Gemini/MusicFX 音訊
+    if (this.customAudioUrl) {
+      try {
+        this.customAudioEl = new Audio(this.customAudioUrl);
+        this.customAudioEl.loop = true;
+        this.customAudioEl.volume = S.muted ? 0.0001 : 0.8;
+        this.customAudioEl.play().catch(e => console.error("Custom BGM play failed", e));
+
+        // 監聽靜音狀態定時器 (連動自訂音訊的音量)
+        const muteChecker = setInterval(() => {
+          if (!this.customAudioEl) return;
+          const targetVal = S.muted ? 0.0001 : 0.8;
+          const currentVal = this.customAudioEl.volume;
+          const diff = targetVal - currentVal;
+          if (Math.abs(diff) > 0.05) {
+            this.customAudioEl.volume = currentVal + Math.sign(diff) * 0.05;
+          } else {
+            this.customAudioEl.volume = targetVal;
+          }
+        }, 100);
+        this.intervals.push(muteChecker);
+        return;
+      } catch (err) {
+        console.error("Failed to play custom audio, falling back to procedural BGM", err);
+      }
+    }
+
+    const c = ac(); if (!c) return;
     
     // 建立主控 Gain 節點並連接至目的地
     this.mainGain = c.createGain();
@@ -168,6 +198,23 @@ const BGM = {
       clearTimeout(t);
     });
     this.intervals = [];
+
+    // 停止自訂音訊播放
+    if (this.customAudioEl) {
+      try {
+        const audio = this.customAudioEl;
+        this.customAudioEl = null;
+        // 平滑淡出自訂音訊
+        let fadeInterval = setInterval(() => {
+          if (audio.volume > 0.05) {
+            audio.volume -= 0.05;
+          } else {
+            audio.pause();
+            clearInterval(fadeInterval);
+          }
+        }, 50);
+      } catch(e) {}
+    }
 
     const c = ac(); if (!c) return;
     const now = c.currentTime;
