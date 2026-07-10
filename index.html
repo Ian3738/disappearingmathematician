@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>消失的數學家 · 乘法公式密室逃脫</title>
+<meta name="theme-color" content="#0b0910">
+<meta name="description" content="以國中『乘法公式』為主題的點擊探索式密室逃脫遊戲，全場景與角色皆為 AI 生成插畫。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="app">
+  <div class="dust" id="dust"></div>
+  <div class="vig"></div>
+  <div class="grain"></div>
+
+  <!-- 場景由 JS 注入 -->
+  <div id="scenes"></div>
+
+  <!-- 標題畫面 -->
+  <section id="title" style="background:linear-gradient(180deg,rgba(6,5,14,.55),rgba(6,5,14,.82)),url('assets/images/sc_gate.webp') center/cover no-repeat,#0b0910">
+    <div class="kick">THE VANISHED MATHEMATICIAN</div>
+    <h1>消失的數學家</h1>
+    <div class="sub">魏教授的最後一道謎題</div>
+    <p class="story">
+      深夜，一封信躺在你桌上——寄件人是失蹤半年的恩師 <b>魏教授</b>。<br>
+      信裡只有一句話：「解開我留下的公式，你就會找到我。」<br>
+      循著地址，你來到教授的研究塔，<b>大門在身後喀地鎖上</b>。<br>
+      塔中四層，各封著一道 <b>乘法公式</b> 機關。唯有真正讀懂公式的人，才能登上塔頂、尋回真相。
+    </p>
+    <button class="btn" id="enterBtn">🔍 推開研究塔大門</button>
+    <div class="credit">分配律 · 和的平方 · 差的平方 · 平方差 ｜ 建議配戴耳機遊玩</div>
+  </section>
+
+  <!-- 結局手稿 -->
+  <section id="ending"></section>
+</div>
+
+<!-- 通用彈窗 -->
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+
+<!-- 分檔原始碼：資料 → 音效 → 引擎 → 謎題 → 主程式 -->
+<script src="assets/js/data.js"></script>
+<script src="assets/js/audio.js"></script>
+<script src="assets/js/engine.js"></script>
+<script src="assets/js/puzzles.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
