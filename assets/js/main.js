@@ -36,6 +36,7 @@ function showEnding() {
     </div>`;
   const cur = $(".scene.on"); if (cur) cur.classList.remove("on");
   box.classList.add("on");
+  if (typeof BGM !== "undefined") BGM.stop();
   SFX.win();
 }
 
@@ -62,6 +63,7 @@ function boot() {
   document.getElementById("enterBtn").addEventListener("click", () => {
     SFX.click();
     ac(); /* 使用者手勢後解鎖 AudioContext */
+    if (typeof BGM !== "undefined") BGM.start();
     const title = document.getElementById("title");
     title.style.transition = "opacity .8s ease";
     title.style.opacity = "0";
