@@ -4,15 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>消失的數學家 · 乘法公式密室逃脫</title>
-<meta name="theme-color" content="#0b0910">
-<meta name="description" content="以國中『乘法公式』為主題的點擊探索式密室逃脫遊戲，全場景與角色皆為 AI 生成插畫。">
+<meta name="theme-color" content="#06060d">
+<meta name="description" content="以國中『乘法公式』為主題的點擊探索式密室逃脫遊戲，商業級暗黑電影感視覺，全場景與角色皆為 AI 生成插畫。">
+<meta property="og:title" content="消失的數學家 · 乘法公式密室逃脫">
+<meta property="og:description" content="登上魏教授的研究塔，解開四道乘法公式機關，尋回最後手稿。">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 <div id="app">
+  <!-- 全域環境層 -->
   <div class="dust" id="dust"></div>
   <div class="vig"></div>
   <div class="grain"></div>
@@ -20,30 +24,57 @@
   <!-- 場景由 JS 注入 -->
   <div id="scenes"></div>
 
-  <!-- 標題畫面 -->
-  <section id="title" style="background:linear-gradient(180deg,rgba(6,5,14,.55),rgba(6,5,14,.82)),url('assets/images/sc_gate.webp') center/cover no-repeat,#0b0910">
-    <div class="kick">THE VANISHED MATHEMATICIAN</div>
-    <h1>消失的數學家</h1>
-    <div class="sub">魏教授的最後一道謎題</div>
-    <p class="story">
-      深夜，一封信躺在你桌上——寄件人是失蹤半年的恩師 <b>魏教授</b>。<br>
-      信裡只有一句話：「解開我留下的公式，你就會找到我。」<br>
-      循著地址，你來到教授的研究塔，<b>大門在身後喀地鎖上</b>。<br>
-      塔中四層，各封著一道 <b>乘法公式</b> 機關。唯有真正讀懂公式的人，才能登上塔頂、尋回真相。
-    </p>
-    <button class="btn" id="enterBtn">🔍 推開研究塔大門</button>
-    <div style="margin: 14px 0 6px;">
-      <label for="bgmUpload" class="btn ghost" style="min-height:36px; padding:6px 16px; font-size:0.85rem; cursor:pointer;">
-        🎵 匯入自訂 Gemini 音訊檔 (.mp3/.wav)
-      </label>
-      <input type="file" id="bgmUpload" accept="audio/*" style="display:none;">
-      <div id="bgmName" style="font-size:0.75rem; color:var(--gold-dim); margin-top:6px;">(未匯入，預設啟動 AI 程式化合成懸疑配樂)</div>
+  <!-- ========== 品牌標題畫面 ========== -->
+  <section id="title">
+    <div class="titlebg" id="titlebg"></div>
+    <div class="wrap">
+      <div class="kick">THE VANISHED MATHEMATICIAN</div>
+      <h1>消失的數學家</h1>
+      <div class="sub">魏教授的最後一道謎題</div>
+      <div class="rule"></div>
+      <p class="story">
+        深夜，一封信躺在你桌上——寄件人是失蹤半年的恩師 <b>魏教授</b>。<br>
+        信裡只有一句話：「解開我留下的公式，你就會找到我。」<br>
+        循著地址，你來到教授的研究塔，<b>大門在身後喀地鎖上</b>。<br>
+        塔中四層，各封著一道 <b>乘法公式</b> 機關——唯有真正讀懂公式的人，才能登上塔頂、尋回真相。
+      </p>
+      <div class="actions">
+        <button class="btn big" id="enterBtn">▸ 推開研究塔大門</button>
+        <div class="bgm-import">
+          <label for="bgmUpload" class="btn ghost" style="min-height:38px;padding:8px 18px;font-size:.82rem;">
+            🎵 匯入自訂配樂 (.mp3 / .wav)
+          </label>
+          <input type="file" id="bgmUpload" accept="audio/*" hidden>
+          <div id="bgmName" class="bgm-name">未匯入 · 預設啟動 AI 程式化合成懸疑配樂</div>
+        </div>
+      </div>
     </div>
-    <div class="credit">分配律 · 和的平方 · 差的平方 · 平方差 ｜ 建議配戴耳機遊玩</div>
+    <div class="credit">
+      <span>分配律</span><i class="dot"></i>
+      <span>和的平方</span><i class="dot"></i>
+      <span>差的平方</span><i class="dot"></i>
+      <span>平方差</span><i class="dot"></i>
+      <span>建議配戴耳機遊玩</span>
+    </div>
   </section>
 
-  <!-- 結局手稿 -->
+  <!-- ========== 結局手稿 ========== -->
   <section id="ending"></section>
+
+  <!-- ========== 章節過場卡 ========== -->
+  <div class="chaptrans" id="chaptrans">
+    <div class="ct-no" id="ctNo"></div>
+    <div class="ct-zh" id="ctZh"></div>
+    <div class="ct-formula" id="ctFormula"></div>
+    <div class="ct-rule"></div>
+  </div>
+</div>
+
+<!-- ========== 載入畫面 ========== -->
+<div id="loader">
+  <div class="ring"></div>
+  <div class="lt">消失的數學家</div>
+  <div class="lp" id="loaderPct">LOADING · 0%</div>
 </div>
 
 <!-- 通用彈窗 -->
