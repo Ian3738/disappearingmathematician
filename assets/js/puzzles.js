@@ -24,7 +24,11 @@ function wireDrag(tilesSel, onAllPlaced) {
   tiles.forEach(t => {
     t.addEventListener("dragstart", e => e.dataTransfer.setData("v", t.dataset.v));
     /* 觸控：點選 tile 再點 slot */
-    t.addEventListener("click", () => { window.__pick = t; t.style.outline = "3px solid var(--gold)"; });
+    t.addEventListener("click", () => {
+      SFX.click();
+      tiles.forEach(x => x.classList.remove("picked"));
+      window.__pick = t; t.classList.add("picked");
+    });
   });
   slots.forEach(sl => {
     sl.addEventListener("dragover", e => e.preventDefault());
@@ -37,7 +41,7 @@ function wireDrag(tilesSel, onAllPlaced) {
       const tile = tiles.find(t => t.dataset.v === v);
       sl.textContent = tile.textContent; sl.style.background = tile.style.background;
       sl.classList.add("filled", "good"); tile.style.visibility = "hidden";
-      if (window.__pick) { window.__pick.style.outline = ""; window.__pick = null; }
+      if (window.__pick) { window.__pick.classList.remove("picked"); window.__pick = null; }
       SFX.good(); placed++;
       if (placed >= slots.length && onAllPlaced) setTimeout(onAllPlaced, 500);
     } else {
@@ -106,8 +110,9 @@ function buildReels(hostId, len) {
     const reel = el(`<div class="reel">
         <button data-up>▲</button><span class="d" data-d>0</span><button data-dn>▼</button></div>`);
     const d = reel.querySelector("[data-d]");
-    reel.querySelector("[data-up]").onclick = () => { SFX.gear(); d.textContent = (Number(d.textContent) + 1) % 10; };
-    reel.querySelector("[data-dn]").onclick = () => { SFX.gear(); d.textContent = (Number(d.textContent) + 9) % 10; };
+    const bump = v => { SFX.gear(); d.textContent = v; d.classList.remove("bump"); void d.offsetWidth; d.classList.add("bump"); };
+    reel.querySelector("[data-up]").onclick = () => bump((Number(d.textContent) + 1) % 10);
+    reel.querySelector("[data-dn]").onclick = () => bump((Number(d.textContent) + 9) % 10);
     host.appendChild(reel);
   }
 }
@@ -121,7 +126,7 @@ function gotoNextFrom(n) {
   const cur = $(".scene.on");
   if (cur) cur.classList.remove("on");
   setTimeout(() => {
-    if (n < 4) renderRoom(n + 1);
+    if (n < 4) chapterTransition(ROOMS[n], () => renderRoom(n + 1));
     else showEnding();
   }, 700);
 }
@@ -159,6 +164,9 @@ function initDarkroom() {
   /* 燭光遮罩：跟隨滑鼠/觸控的鏤空圓 */
   const mask = el('<div class="darkmask" id="darkmask"></div>');
   stage.appendChild(mask);
+  /* 暖色燭火光暈，跟隨游標 */
+  const glow = el('<div class="candleglow" id="candleglow"></div>');
+  stage.appendChild(glow);
   /* 牆上殘缺算式 */
   const wall = el(`<div class="hot" id="dkWall"
       style="left:50%;top:44%;width:min(460px,86vw);height:120px;transform:translate(-50%,-50%);font-size:1.4rem;letter-spacing:.04em">
@@ -172,6 +180,8 @@ function initDarkroom() {
     mask.style.setProperty("--mx", p.clientX + "px");
     mask.style.setProperty("--my", p.clientY + "px");
     mask.style.setProperty("--r", "150px");
+    glow.style.left = p.clientX + "px";
+    glow.style.top = p.clientY + "px";
   };
   stage.addEventListener("mousemove", move);
   stage.addEventListener("touchmove", move, { passive: true });
@@ -226,12 +236,12 @@ function initGate() {
   const stage = $("#stage4");
   let idx = 0, timeLeft = r.timeLimit, timer = null;
   const box = el(`<div class="calc" id="calcBox">
-      <div style="color:var(--gold-dim);font-size:.85rem">塔頂機械鎖 · 平方差速算</div>
+      <div class="kicker">塔頂機械鎖 · 平方差速算</div>
       <div class="q" id="calcQ"></div>
-      <input id="calcIn" type="tel" inputmode="numeric" placeholder="答案" autocomplete="off">
+      <input id="calcIn" type="tel" inputmode="numeric" placeholder="輸入答案" autocomplete="off">
       <div class="bar"><i id="calcBar" style="width:100%"></i></div>
       <div class="prog" id="calcProg"></div>
-      <div class="row" style="margin-top:12px"><button class="btn" id="calcOK">送出</button></div>
+      <div class="row" style="margin-top:16px"><button class="btn" id="calcOK">▸ 送出</button></div>
     </div>`);
   stage.appendChild(box);
 
@@ -254,7 +264,11 @@ function initGate() {
       SFX.good(); idx++;
       if (idx >= r.calc.length) { clearInterval(timer); win(); return; }
       render();
-    } else { bad($("#calcBox"), "算錯了。提示：" + r.calc[idx].hint); }
+    } else {
+      const inp = $("#calcIn");
+      inp.classList.remove("shake"); void inp.offsetWidth; inp.classList.add("shake");
+      bad($("#calcBox"), "算錯了。提示：" + r.calc[idx].hint);
+    }
   }
   function win() {
     good("全部答對！大門緩緩開啟，晨光灑進來……", innerWidth/2, innerHeight/2);
