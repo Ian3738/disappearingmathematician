@@ -207,8 +207,12 @@ sup{font-size:.62em;vertical-align:super;}
 .dlg{position:absolute;left:0;right:0;bottom:0;z-index:22;padding:0 clamp(10px,3vw,40px) clamp(16px,4vh,34px);
   display:flex;align-items:flex-end;pointer-events:none;}
 .dlg.on{pointer-events:auto;}
-.portrait{width:min(260px,30vw);flex:0 0 auto;align-self:flex-end;margin-right:-6px;z-index:1;
-  filter:drop-shadow(0 12px 26px rgba(0,0,0,.7));animation:charIn .5s var(--ease-out);}
+/* 立繪：半身自對話框上緣升起，只露上半身，底部柔和淡出融入場景 */
+.portrait{width:min(300px,34vw);flex:0 0 auto;align-self:flex-end;margin:0 -8px -14px 0;z-index:1;
+  max-height:min(52vh,460px);object-fit:contain;object-position:bottom center;
+  filter:drop-shadow(0 10px 30px rgba(0,0,0,.75));animation:charIn .5s var(--ease-out);
+  -webkit-mask-image:linear-gradient(180deg,#000 82%,transparent 100%);
+          mask-image:linear-gradient(180deg,#000 82%,transparent 100%);}
 .bubble{position:relative;flex:1;min-height:128px;border-radius:var(--r-lg);padding:18px 24px 22px;
   background:linear-gradient(160deg,rgba(22,20,40,.82),rgba(10,9,20,.9));
   border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
