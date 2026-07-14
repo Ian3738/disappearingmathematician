@@ -50,9 +50,9 @@ function renderRoom(n) {
   /* 熱點 */
   r.hots.forEach(h => {
     const box = el(
-      `<button class="hot ${S.doneRoom[n] ? "" : ""}" data-hot="${h.id}"
+      `<button class="hot" data-hot="${h.id}"
          style="left:${h.x};top:${h.y};width:${h.w};height:${h.h};transform:translate(-50%,-50%)">
-         <span>${h.label}</span><span class="tag">${h.tag}</span></button>`);
+         <span class="lbl">${h.label}</span><span class="tag">${h.tag}</span></button>`);
     box.addEventListener("click", () => { SFX.click(); openHot(n, h.id); });
     stage.appendChild(box);
   });
@@ -97,8 +97,21 @@ function playDialogue(seq, done) {
 
 /* ---------- HUD ---------- */
 function hudHTML(r) {
+  /* 關卡進度圓點：已完成=on、當前=cur */
+  let dots = "";
+  for (let i = 1; i <= 4; i++) {
+    const cls = S.doneRoom[i] ? "p on" : (i === r.id ? "p cur" : "p");
+    dots += `<span class="${cls}"></span>`;
+  }
   return `<div class="hud">
-      <div class="chap">${r.chap}<small>${r.en} · ${r.topic}</small></div>
+      <div class="chapbadge">
+        <div class="no">${["Ⅰ","Ⅱ","Ⅲ","Ⅳ"][r.id - 1]}</div>
+        <div class="txt">
+          <div class="zh">${r.chap.replace(/^第.層 · /,"")}</div>
+          <span class="en">${r.en} · ${r.topic}</span>
+        </div>
+        <div class="progress">${dots}</div>
+      </div>
       <div class="tools">
         <div class="timer" id="timer">00:00</div>
         <button class="tool" id="tNotes" title="線索筆記">📖</button>
@@ -143,10 +156,11 @@ function addItem(icon, name, desc) {
 
 /* ---------- 彈窗 / toast / 金色粒子 ---------- */
 function modal(html) {
-  $("#sheet").innerHTML = html;
+  $("#sheet").innerHTML = '<button class="sheet-x" aria-label="關閉">✕</button>' + html;
   $("#modal").classList.add("on");
   SFX.paper();
-  $("#sheet").querySelectorAll("[data-x]").forEach(b => b.onclick = () => closeModal());
+  $("#sheet").querySelector(".sheet-x").onclick = () => { SFX.click(); closeModal(); };
+  $("#sheet").querySelectorAll("[data-x]").forEach(b => b.onclick = () => { SFX.click(); closeModal(); });
 }
 function closeModal() { $("#modal").classList.remove("on"); }
 
@@ -181,8 +195,9 @@ function bad(node, msg) {
 /* ---------- 線索筆記本 ---------- */
 function openNotes() {
   let body = ROOMS.filter(r => S.doneRoom[r.id]).map(r =>
-    `<div class="fc"><h3>${r.topic}（${r.page}）</h3><div class="f">${r.formula}</div></div>`).join("");
-  if (!body) body = "<p style='text-align:center;color:var(--gold-dim)'>還沒有解開任何機關。<br>解開後，公式會記錄在這裡。</p>";
+    `<div class="fc"><h3>${r.topic}　<span style="color:var(--c-gold-dim);font-size:.78rem">${r.page}</span></h3>
+       <div class="f">${r.formula.replace(/²/g,"<sup>2</sup>")}</div></div>`).join("");
+  if (!body) body = "<p style='text-align:center;color:var(--c-gold-dim)'>還沒有解開任何機關。<br>解開後，公式會記錄在這裡。</p>";
   modal(`<h3>📖 線索筆記本</h3><div class="cards">${body}</div>
          <div class="row"><button class="btn" data-x>闔上</button></div>`);
 }
@@ -193,7 +208,7 @@ function openHint(n) {
   const lv = Math.min(S.hints, arr.length - 1);
   modal(`<h3>💡 守關幻影的提示</h3>
     <p>${arr[lv]}</p>
-    <p style="color:var(--gold-dim);font-size:.8rem;text-align:center;margin-top:10px">
+    <p style="color:var(--c-gold-dim);font-size:.8rem;text-align:center;margin-top:10px">
       已求助 ${S.hints + 1} 次（會影響最終稱號，但不阻止你前進）</p>
     <div class="row">
       ${lv < arr.length - 1 ? '<button class="btn ghost" id="moreHint">再給明白一點</button>' : ""}
