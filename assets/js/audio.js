@@ -68,7 +68,7 @@ const BGM = {
     [116.54, 164.81, 220.00, 293.66], // A#2, E3, A3, D4 (三度增幅懸疑)
     [110.00, 146.83, 196.00, 233.08]  // A2, D3, G3, Bb3 (沉重壓抑、無法化解)
   ],
-  customAudioUrl: null,
+  customAudioUrl: "assets/audio/bgm.mp3",
   customAudioEl: null,
 
   start() {
